@@ -1,0 +1,4 @@
+openai==0.27.0
+openai_whisper==20230124
+spacy==3.4.4
+whisper==1.1.10
