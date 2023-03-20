@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Smart Transcribe</title>
+	<style>
+		body {
+			background-color: #c5f2ff;
+			font-family: Arial, sans-serif;
+			font-size: 14px;
+			margin: 0;
+			padding: 0;
+		}
+		
+		h1 {
+			color: #333;
+			font-size: 24px;
+			margin: 20px 0;
+			text-align: center;
+		}
+		
+		.container {
+			background-color: #fff;
+			border: 1px solid #ccc;
+			border-radius: 12px;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+			margin: 20px 15px auto;
+			padding: 20px;
+			width: 80%;
+			height: 80vh;
+			overflow-y: auto;
+		}
+		
+		.text {
+			font-size: 15px;
+			margin: 20px 0;
+			text-align: left;
+		}
+
+		.flex-container {
+  			display: flex;
+		}
+
+		.key {
+			font-weight: bold;
+			text-decoration: underline;
+			color: rgb(0, 179, 219);
+		}
+	</style>
+</head>
+<body>
+	<h1>Transcribe</h1>
+	<div class="flex-container">
+		<div class="container">
+			<p id="transcript" class="text">Waiting for transcript...</p>
+		</div>
+		<div class="container">
+			<div id="def" class="text"></div>
+		</div>
+	</div>
+	<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+	<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

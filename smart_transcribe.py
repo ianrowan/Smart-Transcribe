@@ -6,7 +6,6 @@ import openai
 import pyaudio
 import numpy as np
 import threading
-import multiprocessing
 
 openai.api_key = os.getenv("OPENAI_KEY")
 nlp = spacy.load("en_core_sci_lg")
@@ -21,9 +20,10 @@ frame_start_token = 0
 def gpt_keyword_query(keywords, turbo):
     filer = open("definitions.txt", "r")
     curr_keywords = filer.read()
-    filew = open("definitions.txt", "a")  # append mode
+      # append mode
     #curr_keywords = "None"
     for keyword in keywords:
+        filew = open("definitions.txt", "a")
         if(f"{keyword}:" not in curr_keywords):
             #print(f"Keywork {keyword} is: ")
             if turbo:
@@ -50,10 +50,10 @@ def gpt_keyword_query(keywords, turbo):
                 print(response["choices"][0]["text"].replace("\n",""))
                 print("\n")
                 response = response["choices"][0]["text"].replace("\n","")
-            filew.write(f"{keyword}: {response}\n\n")
+            filew.write(f"{keyword}: {response}\n")
         else:
             print(f"skipping {keyword}")
-    filew.close()
+        filew.close()
     filer.close()
 
 def transcribe(transribe_item, model, new_split):
@@ -84,7 +84,7 @@ def transcribe(transribe_item, model, new_split):
 
     #3. for each keyword, check if exists already and look up def if not 
     print(doc.ents)
-    t1 = threading.Thread(target=gpt_keyword_query, args=(doc.ents, True,))
+    t1 = threading.Thread(target=gpt_keyword_query, args=(doc.ents, False,))
     t1.start()
 
 def main():
