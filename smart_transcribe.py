@@ -7,8 +7,6 @@ import numpy as np
 import threading
 import requests
 import time
-from nltk.corpus import gutenberg
-from sklearn.feature_extraction.text import TfidfVectorizer
 from tfidf_test import vocab, tfidf_matrix
 from nltk import WordNetLemmatizer
 
@@ -41,14 +39,14 @@ def _filter_irrelevant(word):
     global vocab
     global wnl
 
-    cutoff_threshold = 0.0005
-    print(word)
+    cutoff_threshold = 0.0001
+    #print(word)
     try:
         score = tfidf_matrix[0, vocab[wnl.lemmatize(word.lower())]]
-        print(score)
+        #print(score)
         return score > cutoff_threshold
     except KeyError:
-        print("not found, not skipping")
+        #print("not found, not skipping")
         return False
 
 def gpt_keyword_query(keywords, turbo):
@@ -90,7 +88,7 @@ def gpt_keyword_query(keywords, turbo):
                     )
                 #print(response["choices"][0]["text"].replace("\n",""))
                 #print("\n")
-                response = response["choices"][0]["text"].replace("\n","")
+                response = response["choices"][0]["text"].replace("\n","").replace(":","")
             filew.write(f"{keyword}: {response}\n")
         else:
             print(f"skipping {keyword}")

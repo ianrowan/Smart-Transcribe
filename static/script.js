@@ -12,12 +12,28 @@ const hideShow = (id) => {
 }
 
 socket.on('transcript', (data) => {
-  console.log(`Received transcript: ${data}`);
-  document.getElementById('transcript').textContent = data;
+  //console.log(`Received transcript: ${data}`);
+  var words = data.split(' ')
+  var content = ''
+  var idLookup = {}
+  var keys = Object.keys(prevElements).map((key) => {
+    const first = key.split(' ')[0]
+    idLookup[first] = key;
+    return String(first).toLowerCase()
+  })
+  //Todo handle multi-word keys
+  for(var word of words){
+    if(keys.includes(word.toLowerCase())){
+      content += `<span class="key" onclick="hideShow('${idLookup[word]}')">${word} </span>`
+    }else{
+      content += word+ " "
+    }
+  }
+  document.getElementById('transcript').innerHTML = content;
 });
 
 socket.on('definition', (data) => {
-  console.log(`Received transcript: ${data}`);
+  console.log(`Received defs: ${data}`);
   
   const defs = JSON.parse(data)
 		for (const [key, value] of Object.entries(defs)) {
