@@ -7,8 +7,10 @@ import numpy as np
 import threading
 import requests
 import time
-from nltk.corpus import reuters
+from nltk.corpus import gutenberg
 from sklearn.feature_extraction.text import TfidfVectorizer
+from tfidf_test import vocab, tfidf_matrix
+from nltk import WordNetLemmatizer
 
 openai.api_key = os.getenv("OPENAI_KEY")
 nlp = spacy.load("en_core_sci_scibert")
@@ -17,9 +19,7 @@ nlp.enable_pipe("ner")
 #print(nlp.get_pipe("ner").cfg)
 #nlp.get_pipe("ner").cfg["beam_density"] = 0.00005
 
-tfidf = TfidfVectorizer()
-tfidf_matrix = tfidf.fit_transform([reuters.raw()])
-vocab = tfidf.vocabulary_
+wnl = WordNetLemmatizer()
 
 model = whisper.load_model("base.en")
 curr_end_token = 0
@@ -27,17 +27,28 @@ frame_start_token = 0
 
 keywords = []
 
-def filter_irrelevant(word):
+# For use with slow servers
+def _keyword_job():
+    while True:
+        global keywords
+        if len(keywords):
+            word = keywords.pop(0)
+            gpt_keyword_query([word], True)
+        time.sleep(1)
+
+def _filter_irrelevant(word):
     global tfidf_matrix
     global vocab
-    cutoff_threshold = 0.0012
+    global wnl
+
+    cutoff_threshold = 0.0005
     print(word)
     try:
-        score = tfidf_matrix[0, vocab[word.lower()]]
+        score = tfidf_matrix[0, vocab[wnl.lemmatize(word.lower())]]
         print(score)
         return score > cutoff_threshold
     except KeyError:
-        print("not skipping")
+        print("not found, not skipping")
         return False
 
 def gpt_keyword_query(keywords, turbo):
@@ -47,7 +58,7 @@ def gpt_keyword_query(keywords, turbo):
     #curr_keywords = "None"
     for keyword in keywords:
         filew = open("definitions.txt", "a")
-        if(f"{keyword}:" not in curr_keywords and not filter_irrelevant(str(keyword))):
+        if(f"{keyword}:" not in curr_keywords and not _filter_irrelevant(str(keyword).split(" ")[0])):
             #print(f"Keywork {keyword} is: ")
             if turbo:
                 '''
@@ -171,13 +182,5 @@ def main():
         stream.stop_stream()
         stream.close()
         p.terminate()
-
-def keyword_job():
-    while True:
-        global keywords
-        if len(keywords):
-            word = keywords.pop(0)
-            gpt_keyword_query([word], True)
-        time.sleep(1)
 
 main()
