@@ -6,10 +6,7 @@
 	<title>GPTranscribe</title>
 	<style>
 		body {
-			background-color: #c5f2ff;
-			background-image: url(https://img.freepik.com/free-vector/dark-gradient-background-with-copy-space_53876-99548.jpg?w=2000&t=st=1680111858~exp=1680112458~hmac=53b34eb8cf314ebc7bcce20008932644efe571bf2b90b7a3769c34408c7c8ea7);
-			background-repeat: no-repeat;
-			font-family: 'Roboto', sans-serif;
+			background-color: #1c1c1c;
 			font-size: 14px;
 			margin: 0;
 			padding: 0;
@@ -24,10 +21,10 @@
 		}
 		
 		.container {
-			background-color: #fff;
-			border: 1px solid #ccc;
+			background-color: #282926;
+			border: 1px solid #676767;
 			border-radius: 12px;
-			box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 0 5px rgba(67, 67, 67, 0.1);
 			margin: 20px 15px auto;
 			padding: 20px;
 			width: 80%;
@@ -37,9 +34,10 @@
 		
 		.text {
 			font-size: 15px;
+			color: #ECECF1;
 			margin: 20px 0;
 			text-align: left;
-			font-family: 'Roboto', sans-serif;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 		}
 
 		.flex-container {
@@ -55,7 +53,9 @@
 	</style>
 </head>
 <body>
-	<h1 style="text-shadow: #ccc; color:#fff; font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">GPTranscribe</h1>
+	<div style="text-align: center; padding-top: 25px; padding-bottom: 5px;">
+		<img src="{{ url_for('static', filename='logo.png') }}" alt="defyn" style="width: 20%;">
+	</div>
 	<div class="flex-container">
 		<div class="container">
 			<p id="transcript" class="text">Waiting for transcript...</p>

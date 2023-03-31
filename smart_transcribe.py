@@ -7,6 +7,7 @@ import numpy as np
 import threading
 import requests
 import time
+import json
 from tfidf_test import vocab, tfidf_matrix
 from nltk import WordNetLemmatizer
 
@@ -50,12 +51,16 @@ def _filter_irrelevant(word):
         return False
 
 def gpt_keyword_query(keywords, turbo):
-    filer = open("definitions.txt", "r")
-    curr_keywords = filer.read()
+    #filer = open("definitions.txt", "r")
+    #curr_keywords = filer.read()
+    json_r = open("definitions.json", "r")
+    curr_keywords = list(json.load(json_r).keys())
+    json_r.close()
       # append mode
     #curr_keywords = "None"
     for keyword in keywords:
-        filew = open("definitions.txt", "a")
+        #filew = open("definitions.txt", "a")
+        json_w = open("definitions.json", "r+")
         if(f"{keyword}:" not in curr_keywords and not _filter_irrelevant(str(keyword).split(" ")[0])):
             #print(f"Keywork {keyword} is: ")
             if turbo:
@@ -89,11 +94,17 @@ def gpt_keyword_query(keywords, turbo):
                 #print(response["choices"][0]["text"].replace("\n",""))
                 #print("\n")
                 response = response["choices"][0]["text"].replace("\n","").replace(":","")
-            filew.write(f"{keyword}: {response}\n")
+            data = json.load(json_w)
+            data[str(keyword)] = response
+            json_w.seek(0)
+            json.dump(data, json_w)
+            #filew.write(f"{keyword}: {response}\n")
         else:
             print(f"skipping {keyword}")
-        filew.close()
-    filer.close()
+        #filew.close()
+        json_w.close()
+    #filer.close()
+    
 
 def transcribe(transribe_item, model, new_split):
     #1. Transcribe all text and overwrite file
@@ -174,7 +185,7 @@ def main():
             #mp = multiprocessing.Process(target=transcribe, args=(numpydata, model, reset_frame))
             mp = threading.Thread(target=transcribe, args=(numpydata, model, reset_frame))
             mp.start()
-
+ 
     except KeyboardInterrupt:
         # close stream
         stream.stop_stream()

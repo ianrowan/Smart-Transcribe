@@ -23,7 +23,7 @@ socket.on('transcript', (data) => {
   })
   //Todo handle multi-word keys
   for(var word of words){
-    if(keys.includes(word.toLowerCase())){
+    if(keys.includes(word.toLowerCase().replace(/[^\w\s]/gi, ''))){
       content += `<span class="key" onclick="hideShow('${idLookup[word]}')">${word} </span>`
     }else{
       content += word+ " "
