@@ -16,14 +16,14 @@ def transcript():
         content = f.read()
         socketio.emit('transcript', content)
         f.close()
-        time.sleep(5)
+        time.sleep(3)
 
 def definitions():
     while True:
         with open('definitions.json', 'r') as f:
             json_data = json.load(f)
         socketio.emit('definition', json.dumps(json_data))
-        time.sleep(5)
+        time.sleep(3)
 
 if __name__ == '__main__':
     socketio.start_background_task(transcript)

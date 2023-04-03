@@ -25,6 +25,10 @@ curr_end_token = 0
 frame_start_token = 0
 
 keywords = []
+terms_json = open("term_store.json", "r")
+existing_terms = json.load(terms_json)
+existing_keys = existing_terms.keys()
+terms_json.close()
 
 # For use with slow servers
 def _keyword_job():
@@ -50,17 +54,24 @@ def _filter_irrelevant(word):
         #print("not found, not skipping")
         return False
 
+def _store_def(word, definition):
+    json_w = open("term_store.json", "r+")
+    data = json.load(json_w)
+    data[str(word).lower().replace(" ", "").replace(".","").replace("'","")] = definition
+    json_w.seek(0)
+    json.dump(data, json_w)
+    json_w.close()
+
 def gpt_keyword_query(keywords, turbo):
-    #filer = open("definitions.txt", "r")
-    #curr_keywords = filer.read()
     json_r = open("definitions.json", "r")
     curr_keywords = list(json.load(json_r).keys())
     json_r.close()
-      # append mode
+
+    global existing_terms
+    global existing_keys
+
     #curr_keywords = "None"
     for keyword in keywords:
-        #filew = open("definitions.txt", "a")
-        json_w = open("definitions.json", "r+")
         if(f"{keyword}:" not in curr_keywords and not _filter_irrelevant(str(keyword).split(" ")[0])):
             #print(f"Keywork {keyword} is: ")
             if turbo:
@@ -82,7 +93,12 @@ def gpt_keyword_query(keywords, turbo):
                 #print(response["choices"][0]["message"]["content"])
                 #print("\n")
             else:
-                response = openai.Completion.create(
+                stemmed_keyword = str(keyword).lower().replace(" ", "").replace(".","").replace("'","")
+                use_existing = stemmed_keyword in existing_keys
+                if(use_existing):
+                    print("using existing term")
+                response = existing_terms[stemmed_keyword] if use_existing else\
+                openai.Completion.create(
                     model="text-davinci-003",
                     prompt= f"In 4 sentences or less what is {keyword}?",
                     temperature=0,
@@ -93,17 +109,18 @@ def gpt_keyword_query(keywords, turbo):
                     )
                 #print(response["choices"][0]["text"].replace("\n",""))
                 #print("\n")
-                response = response["choices"][0]["text"].replace("\n","").replace(":","")
+                response = response["choices"][0]["text"].replace("\n","").replace(":","") if not use_existing else response
+            json_w = open("definitions.json", "r+")
             data = json.load(json_w)
             data[str(keyword)] = response
             json_w.seek(0)
             json.dump(data, json_w)
-            #filew.write(f"{keyword}: {response}\n")
+            json_w.close()
+            if(not use_existing):
+                _store_def(keyword, response)
         else:
             print(f"skipping {keyword}")
-        #filew.close()
-        json_w.close()
-    #filer.close()
+        
     
 
 def transcribe(transribe_item, model, new_split):
@@ -143,13 +160,10 @@ def main():
     file1 = open("transcript.txt", "w")
     file1.write("")
     file1.close()
-    file2 = open("definitions.txt", "w")
-    file2.write("")
-    file2.close()
 
     CHUNKSIZE = 1024 # fixed chunk size
     RATE= 16000
-    RECORD_SECONDS = 5
+    RECORD_SECONDS = 3
     # initialize portaudio
     p = pyaudio.PyAudio()
     
@@ -178,7 +192,7 @@ def main():
             for i in range(0, int(RATE / CHUNKSIZE * RECORD_SECONDS)):
                 data = stream.read(CHUNKSIZE)
                 frames.append(data)
-            sec_count += 5
+            sec_count += 3
             #print("done recording")
             
             numpydata = np.frombuffer(np.array(frames).flatten(), dtype=np.int16).flatten().astype(np.float32) / 32768.0 
