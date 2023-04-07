@@ -8,8 +8,8 @@ import threading
 import requests
 import time
 import json
-from tfidf_test import vocab, tfidf_matrix
 from nltk import WordNetLemmatizer
+import scipy.sparse as sp
 
 openai.api_key = os.getenv("OPENAI_KEY")
 nlp = spacy.load("en_core_sci_scibert")
@@ -19,6 +19,11 @@ nlp.enable_pipe("ner")
 #nlp.get_pipe("ner").cfg["beam_density"] = 0.00005
 
 wnl = WordNetLemmatizer()
+vocab_json = open("vocab.json", "r")
+vocab = json.load(vocab_json)
+vocab_json.close()
+
+tfidf_matrix = sp.load_npz("tfidf.npz")
 
 model = whisper.load_model("base.en")
 curr_end_token = 0
@@ -206,4 +211,4 @@ def main():
         stream.close()
         p.terminate()
 
-main()
+#main()
