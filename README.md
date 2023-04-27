@@ -1,5 +1,5 @@
 # GPTranscribe
-
+MacOs and Web App in progress
 Welcome to GPTranscribe(for now)! This python application(for now) allows for transcription of system audio(ie a meeting or youtube video), extraction of important terms and GPT driven definitions for the terms you used to google during a meeting or video. Think of this as the equivelant of left clicking text and searching for a definition but for system audio! 
 
 ## Setup
