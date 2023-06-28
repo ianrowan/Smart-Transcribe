@@ -8,6 +8,7 @@ GPTranscribe requires 3 main dependencies
 1. python 3.7-3.9
 2. An openAI API key
 3. blackhole 2 Channel audio driver
+4. ffmpeg
 
 Assuming the user has 1, 2 and a cloned repo follow these steps for setup:
 
